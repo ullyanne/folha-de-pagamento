@@ -1,4 +1,4 @@
-# folha-de-pagamento
+# Folha de Pagamento
 Sistema de Folha de Pagamento em Python para a disciplina de Projeto de Software
 
 O objetivo do projeto é construir um sistema de folha de pagamento. O sistema consiste do
@@ -14,6 +14,7 @@ impostos deduzidos do salário.
 |3| Lançar um Cartão de Ponto| O sistema anotará a informação do cartão de ponto e a associará ao empregado correto.|
 |4| Lançar um Resultado de Venda| O sistema anotará a informação do resultado da venda e a associará ao empregado correto.|
 |5| Lançar uma taxa de serviço|O sistema anotará a informação da taxa de serviço e a associará ao empregado correto.|
-|6| Alterar detalhes de um empregado| Os seguintes atributos de um empregado podem seralterados: nome, endereço, tipo (hourly,salaried,commisioned), método de pagamento, se pertence ao sindicato ou não, identificação no sindicato, taxa sindical|
+|6| Alterar detalhes de um empregado| Os seguintes atributos de um empregado podem ser alterados: nome, endereço, tipo (hourly, salaried, commisioned), método de pagamento, se pertence ao sindicato ou não, identificação no sindicato, taxa sindical|
 
-:mag::woman_technologist: Para mais informações, [confira](Folha_de_Pagamento.pdf) o documento completo do projeto.
+## :mag::woman_technologist: 
+Para mais informações, [confira](Folha_de_Pagamento.pdf) o documento completo do projeto.
