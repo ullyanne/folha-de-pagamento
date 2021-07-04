@@ -1,6 +1,6 @@
 import time
+import datetime
 import textwrap
-import random
 
 class Company:
     id = 0
@@ -10,6 +10,29 @@ class Company:
         Company.employees.append(new)
         print("Empregado adicionado com sucesso!")
         Company.id = Company.id+1
+    
+    def printTable():
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎")
+        print("└" + 60*"╌" + "┘")
+        for employee in Company.employees:
+            print(employee)
+        print("\n")
+        time.sleep(1)
+
+    def removeEmployee():
+        Company.printTable()
+        id = input("Informe o ID do funcionário que deseja remover\n")
+        id = int(id)
+
+        for employee in Company.employees:
+            if employee.id == id:
+                if employee.isInSyndicate:
+                    Syndicate.removeEmployee(employee.syndId)
+                Company.employees.remove(employee)
+                time.sleep(1)
+                return print("Empregado removido com sucesso!")
+        time.sleep(1)
+        print("Funcionário não encontrado")
 
 class Employee:
     def __init__(self, name, address, category, id, paymentMethod, isInSyndicate):
@@ -19,6 +42,7 @@ class Employee:
         self.id = id
         self.paymentMethod = paymentMethod
         self.isInSyndicate = isInSyndicate
+        self.syndId = None
     
     def __str__(self):
         return("╎ " + self.category + " " *(13-len(self.category)) + "╎ " + str(self.id) + " " * (2-len(str(self.id)))
@@ -91,6 +115,11 @@ class Syndicate:
         new.syndId = Syndicate.syndId
         Syndicate.syndId = Syndicate.syndId-1
         Syndicate.employees.append(new)
+    
+    def removeEmployee(syndId):
+        for employee in Syndicate.employees:
+            if employee.syndId == syndId:
+                Syndicate.employees.remove(employee)
 
 #cartão de ponto
 class WorkedHours:
@@ -119,7 +148,19 @@ class Payroll():
     "3": "Depósito em conta bancária"
     }
 
+def greetings():
+    now = datetime.datetime.now().hour
+    if now >= 6 and now < 12:
+        print(">>>> Bom dia,", end="")
+    elif now >= 12 and now < 18:
+        print(">>>> Boa tarde,", end="")
+    else:
+        print(">>>> Boa noite,", end="")
+    print(" seja bem-vindo(a) ao sistema de Folha de Pagamento <<<<\n")
+    time.sleep(1)
+
 def menu():
+    greetings()
     choice = ""
     while choice != "8":
         choice = input(textwrap.dedent("""\
@@ -137,16 +178,9 @@ def menu():
             newEmployee = Employee.create()    
             Company.addEmployee(newEmployee)
             time.sleep(1)
+        if choice == "2":
+            Company.removeEmployee()
         elif choice == "7":
-            print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎")
-            print("└" + 60*"╌" + "┘")
-            for employee in Company.employees:
-                print(employee)
-            print("\n")
-            time.sleep(1)
-
-
-print(">>> Bem-vindo(a) ao sistema de Folha de Pagamento <<<<\n")
-time.sleep(1)
+            Company.printTable()
 
 menu()
