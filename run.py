@@ -29,9 +29,7 @@ class Company:
                 if employee.isInSyndicate:
                     Syndicate.removeEmployee(employee.syndId)
                 Company.employees.remove(employee)
-                time.sleep(1)
                 return print("Empregado removido com sucesso!")
-        time.sleep(1)
         print("Funcionário não encontrado")
 
 class Employee:
@@ -43,6 +41,7 @@ class Employee:
         self.paymentMethod = paymentMethod
         self.isInSyndicate = isInSyndicate
         self.syndId = None
+        self.salary = None
     
     def __str__(self):
         return("╎ " + self.category + " " *(13-len(self.category)) + "╎ " + str(self.id) + " " * (2-len(str(self.id)))
@@ -123,12 +122,50 @@ class Syndicate:
 
 #cartão de ponto
 class WorkedHours:
-    pass
+    entries = []
+
+    def printTable():
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎ Horas trabalhadas ╎")
+        print("└" + 80*"╌" + "┘")
+        for entry in WorkedHours.entries:
+            print(entry, end="")
+            totalHours = entry.workStatus["total hours"]
+            if totalHours == None:
+                print("Em serviço" + 8* " " + "╎")
+            else: 
+                totalHours = int(totalHours)
+                print(totalHours, end="")
+                print((18 - len(str(totalHours)))* " " + "╎")
+        print("\n")
+
+    def punchIn():
+        Company.printTable()
+        id = int(input("Por gentileza, informe seu ID\n"))
+
+        for employee in Company.employees:
+            if employee.id == id:
+                if employee.category != "Horista" : return print("Operação não permitida")
+                currentHour = str(input("Insira a data e o horário atual no seguinte formato: AAAA-MM-DD HH:MM\n"))
+                currentHour = datetime.datetime.strptime(currentHour, "%Y-%m-%d %H:%M")
+
+                if employee.workStatus["entry"] == None:
+                    employee.workStatus["entry"] = currentHour
+                    WorkedHours.entries.append(employee)
+                    print("Ponto de entrada lançado com sucesso!")
+                else:
+                    employee.workStatus["exit"] = currentHour
+                    employee.workStatus["total hours"] = (employee.workStatus["exit"] - employee.workStatus["entry"]).total_seconds()/3600
+                    employee.workStatus["entry"] = None
+                    print("Ponto de saída lançado com sucesso!")
+                
+                return
+        print("Funcionário não encontrado")
 
 class Hourly(Employee):
     def __init__(self, name, address, category, id, paymentMethod, isInSyndicate, wage):
         super().__init__(name, address, category, id, paymentMethod, isInSyndicate)
         self.wage = wage
+        self.workStatus = {"entry": None, "exit": None, "total hours": None}
 
 class Salaried(Employee):
     def __init__(self, name, address, category, id, paymentMethod, isInSyndicate, fixedSalary):
@@ -141,7 +178,7 @@ class Commisioned(Salaried):
         self.fixedSalary = fixedSalary
         self.comissionPercent = comissionPercent
 
-class Payroll():
+class Payroll:
     paymentMethod = {
     "1": "Cheque pelos correios",
     "2": "Cheque em mãos",
@@ -172,15 +209,34 @@ def menu():
                     [4] - Lançar um resultado de venda
                     [5] - Lançar uma taxa de serviço
                     [6] - Alterar detalhes de um empregado
-                    [7] - Mostrar os empregados cadastrados
+                    [7] - Listar os empregados cadastrados
                     [8] - Sair\n"""))
         if choice == "1":
             newEmployee = Employee.create()    
             Company.addEmployee(newEmployee)
-            time.sleep(1)
-        if choice == "2":
+        elif choice == "2":
             Company.removeEmployee()
+        elif choice == "3":
+            option = ""
+            while option not in ["1", "2"]:
+                option = input(textwrap.dedent("""\
+                            Escolha uma opção abaixo:
+                                [1] - Bater ponto
+                                [2] - Listar cartão de ponto de hoje\n"""))
+                if option not in ["1", "2"]:
+                    print("Opção inválida")
+                    time.sleep(1)
+            WorkedHours.punchIn() if option == "1" else WorkedHours.printTable()
+        elif choice == "4":
+            print("Em breve")
+        elif choice == "5":
+            print("Em breve")
+        elif choice == "6":
+            print("Em breve")
         elif choice == "7":
             Company.printTable()
+        time.sleep(1)
+        
+    print("Até mais :)")
 
 menu()
