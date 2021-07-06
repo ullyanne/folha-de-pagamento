@@ -41,7 +41,7 @@ class Employee:
         self.paymentMethod = paymentMethod
         self.isInSyndicate = isInSyndicate
         self.syndId = None
-        self.salary = None
+        self.salary = 0
     
     def __str__(self):
         return("╎ " + self.category + " " *(13-len(self.category)) + "╎ " + str(self.id) + " " * (2-len(str(self.id)))
@@ -98,8 +98,8 @@ class Employee:
             newEmployee = Salaried(name, address, "Assalariado", id, paymentMethod, isInSyndicate, fixedSalary)
         elif category == "3":
             fixedSalary = input("Insira o salário fixo mensal:\n")
-            comissionPercent = input("Insira o percentual de comissão:\n")
-            newEmployee = Commisioned(name, address, "Comissionado", id, paymentMethod, isInSyndicate, fixedSalary, comissionPercent)
+            comissionPercent = int(input("Insira o percentual de comissão:\n"))
+            newEmployee = Commissioned(name, address, "Comissionado", id, paymentMethod, isInSyndicate, fixedSalary, comissionPercent)
         
         if newEmployee.isInSyndicate:
             Syndicate.addEmployee(newEmployee)
@@ -172,11 +172,34 @@ class Salaried(Employee):
         super().__init__(name, address, category, id, paymentMethod, isInSyndicate)
         self.fixedSalary = fixedSalary
 
-class Commisioned(Salaried):
+class Commissioned(Salaried):
     def __init__(self, name, address, category, id, paymentMethod, isInSyndicate, fixedSalary, comissionPercent):
         super().__init__(name, address, category, id, paymentMethod, isInSyndicate, fixedSalary)
         self.fixedSalary = fixedSalary
-        self.comissionPercent = comissionPercent
+        self.comissionPercent = int(comissionPercent)
+    
+    def printTable():
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎ Comissão ╎" )
+        print("└" + 71*"╌" + "┘")
+        for employee in Company.employees:
+            if employee.category == "Comissionado" : print(employee, end="")
+            comission = str(employee.comissionPercent)
+            print(comission + (9 - len(comission))* " " + "╎")
+        print("\n")
+        time.sleep(1)
+
+    def postSale():
+        Commissioned.printTable()
+        id = int(input("Informe o ID do funcionário\n"))
+    
+        for employee in Company.employees:
+            if employee.id == id:
+                date = str(input("Insira a data de venda no seguinte formato: AAAA-MM-DD\n"))
+                date = datetime.datetime.strptime(date, "%Y-%m-%d")
+                sale = int(input("Insira o valor da venda\n"))
+                employee.salary = employee.salary + employee.comissionPercent/100 * sale
+                return print("Venda lançada com sucesso!")
+        print("Funcionário não encontrado")
 
 class Payroll:
     paymentMethod = {
@@ -228,14 +251,15 @@ def menu():
                     time.sleep(1)
             WorkedHours.punchIn() if option == "1" else WorkedHours.printTable()
         elif choice == "4":
-            print("Em breve")
+            Commissioned.postSale()
         elif choice == "5":
             print("Em breve")
         elif choice == "6":
             print("Em breve")
         elif choice == "7":
             Company.printTable()
-        time.sleep(1)
+        
+        if choice!= "8" : time.sleep(1)
         
     print("Até mais :)")
 
