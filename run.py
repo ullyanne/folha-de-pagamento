@@ -42,6 +42,8 @@ class Employee:
         self.isInSyndicate = isInSyndicate
         self.syndId = None
         self.salary = 0
+        self.monthlyFee = 0
+        self.serviceFee = []
     
     def __str__(self):
         return("╎ " + self.category + " " *(13-len(self.category)) + "╎ " + str(self.id) + " " * (2-len(str(self.id)))
@@ -84,6 +86,7 @@ class Employee:
             
             if isInSyndicate == "S":
                 isInSyndicate = True
+                monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato\n"))
             elif isInSyndicate == "N":
                 isInSyndicate = False
             else:
@@ -102,6 +105,7 @@ class Employee:
             newEmployee = Commissioned(name, address, "Comissionado", id, paymentMethod, isInSyndicate, fixedSalary, comissionPercent)
         
         if newEmployee.isInSyndicate:
+            newEmployee.monthlyFee = monthlyFee
             Syndicate.addEmployee(newEmployee)
 
         return newEmployee
@@ -119,6 +123,26 @@ class Syndicate:
         for employee in Syndicate.employees:
             if employee.syndId == syndId:
                 Syndicate.employees.remove(employee)
+    
+    def printTable():
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎ ID Sindicato ╎" )
+        print("└" + 75*"╌" + "┘")
+        for employee in Syndicate.employees:
+            print(employee, end="")
+            syndId = str(employee.syndId)
+            print(syndId + (13 - len(syndId))* " " + "╎")
+        print("\n")
+        time.sleep(1)
+    
+    def addServiceFee():
+        Syndicate.printTable()
+        syndId = int(input("Informe o ID do funcionário no sindicato\n"))
+        for employee in Syndicate.employees:
+            if employee.syndId == syndId:
+                serviceFee = int(input("Informe o valor da taxa de serviço a ser cobrada\n"))
+                employee.serviceFee.append(serviceFee)
+                return print("Taxa de serviço atribuída com sucesso!")
+        print("ID no sindicato inválido")
 
 #cartão de ponto
 class WorkedHours:
@@ -176,7 +200,7 @@ class Commissioned(Salaried):
     def __init__(self, name, address, category, id, paymentMethod, isInSyndicate, fixedSalary, comissionPercent):
         super().__init__(name, address, category, id, paymentMethod, isInSyndicate, fixedSalary)
         self.fixedSalary = fixedSalary
-        self.comissionPercent = int(comissionPercent)
+        self.comissionPercent = comissionPercent
     
     def printTable():
         print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎ Comissão ╎" )
@@ -235,7 +259,7 @@ def menu():
                     [7] - Listar os empregados cadastrados
                     [8] - Sair\n"""))
         if choice == "1":
-            newEmployee = Employee.create()    
+            newEmployee = Employee.create()
             Company.addEmployee(newEmployee)
         elif choice == "2":
             Company.removeEmployee()
@@ -253,7 +277,7 @@ def menu():
         elif choice == "4":
             Commissioned.postSale()
         elif choice == "5":
-            print("Em breve")
+            Syndicate.addServiceFee()
         elif choice == "6":
             print("Em breve")
         elif choice == "7":
