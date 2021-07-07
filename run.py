@@ -12,15 +12,15 @@ class Company:
         Company.id = Company.id+1
     
     def printTable():
-        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎")
-        print("└" + 60*"╌" + "┘")
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎")
+        print("└" + 59*"╌" + "┘")
         for employee in Company.employees:
             print(employee)
         print("\n")
-        time.sleep(1)
 
     def removeEmployee():
         Company.printTable()
+        time.sleep(1)
         id = input("Informe o ID do funcionário que deseja remover\n")
         id = int(id)
 
@@ -40,14 +40,14 @@ class Employee:
         self.id = id
         self.paymentMethod = paymentMethod
         self.isInSyndicate = isInSyndicate
-        self.syndId = None
+        self.syndId = " "
         self.salary = 0
         self.monthlyFee = 0
         self.serviceFee = []
     
     def __str__(self):
         return("╎ " + self.category + " " *(13-len(self.category)) + "╎ " + str(self.id) + " " * (2-len(str(self.id)))
-                + " ╎ " + self.name + " " * (20-len(self.name)) + " ╎ " 
+                + " ╎ " + self.name + " " * (19-len(self.name)) + " ╎ " 
                 + self.address + " " * (15-len(self.address)) + " ╎ ")
     
     def create():
@@ -86,7 +86,7 @@ class Employee:
             
             if isInSyndicate == "S":
                 isInSyndicate = True
-                monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato\n"))
+                monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato:\n"))
             elif isInSyndicate == "N":
                 isInSyndicate = False
             else:
@@ -110,6 +110,133 @@ class Employee:
 
         return newEmployee
 
+    def search():
+        valid = False
+        id = int(input("Informe o ID do funcionário\n"))
+        
+        for employee in Company.employees:
+            if employee.id == id:
+                valid = True
+                return employee
+        
+        print("Funcionário não encontrado")
+        valid = False
+        return valid
+
+    #a alterar
+    def edit():
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎ Método de Pagamento        ", end = "")
+        print("╎ Sindicato ╎ ╎ ID Sindicato ╎ ╎ Taxa Mensal ╎")
+        print("└" + 133*"╌" + "┘")
+
+        for employee in Company.employees:
+            print(employee, end = "")
+            print(Payroll.paymentMethod[employee.paymentMethod] + (27 - len(Payroll.paymentMethod[employee.paymentMethod]))* " " + "╎", end = "")
+            print(" Ativo     ", end="") if employee.isInSyndicate == True else print(" Inativo   ", end = "")
+            print("╎ ╎ " + str(employee.syndId) + (13 - len(str(employee.syndId)))* " " + "╎ ", end = "")
+            print("╎ " + str(employee.monthlyFee) + (12 - len(str(employee.monthlyFee)))* " " + "╎")
+        
+        print("\n")
+        time.sleep(1)
+        employee = Employee.search()
+        
+        if employee == False:
+            return
+
+        option = ""
+
+        while option not in ["1", "2", "3", "4", "5", "6", "7"]:
+            option = input(textwrap.dedent("""\
+                Qual dado deseja alterar?
+                    [1] - Categoria
+                    [2] - Nome
+                    [3] - Endereço
+                    [4] - Método de pagamento
+                    [5] - Status no sindicato
+                    [6] - ID no sindicato
+                    [7] - Taxa mensal\n"""))
+            
+            if option not in ["1", "2", "3", "4", "5", "6", "7"]:
+                print("Opção inválida")
+                time.sleep(1)
+
+        if option == "1":
+            category = ""
+
+            while category not in ["1", "2", "3"]:
+                category = input(textwrap.dedent("""\
+                                                    Escolha a nova categoria:
+                                                        [1] - Horista
+                                                        [2] - Assalariado
+                                                        [3] - Comissionado\n"""))
+                
+                if category not in ["1", "2", "3"]:
+                    print("Tipo inválido")
+                    time.sleep(1)
+            
+            
+            if category == "1":
+                wage = input("Insira quanto o empregado recebe por hora:\n")
+                newEmployee = Hourly(employee.name, employee.address, "Horista", employee.id, employee.paymentMethod, employee.isInSyndicate, wage)
+            elif category == "2":
+                fixedSalary = input("Insira o salário fixo mensal:\n")
+                newEmployee = Salaried(employee.name, employee.address, "Assalariado", employee.id, employee.paymentMethod, employee.isInSyndicate, fixedSalary)
+            elif category == "3":
+                fixedSalary = input("Insira o salário fixo mensal:\n")
+                comissionPercent = int(input("Insira o percentual de comissão:\n"))
+                newEmployee = Commissioned(employee.name, employee.address, "Comissionado", employee.id, employee.paymentMethod, employee.isInSyndicate, fixedSalary, comissionPercent)
+            
+            if employee.isInSyndicate:
+                    newEmployee.serviceFee = employee.serviceFee
+                    newEmployee.syndId = employee.syndId
+                    newEmployee.monthlyFee = employee.monthlyFee
+                    Syndicate.removeEmployee(employee.syndId)
+                    Syndicate.employees.append(newEmployee)
+            Company.employees.remove(employee)
+            Company.employees.append(newEmployee)
+        elif option == "2":
+            newName = input("Insira o novo nome\n")
+            employee.name = newName
+        elif option == "3":
+            newAddress = input("Insira o novo endereço\n")
+            employee.address = newAddress
+        elif option == "4":
+            paymentMethod = ""
+            while paymentMethod not in ["1", "2", "3"]:
+                paymentMethod = input(textwrap.dedent("""\
+                                                        Escolha o novo método de pagamento
+                                                            [1] - Cheque pelos correios
+                                                            [2] - Cheque em mãos
+                                                            [3] - Depósito em conta bancária\n"""))
+                if paymentMethod not in ["1", "2", "3"]:
+                    print("Método de pagamento inválido")
+                    time.sleep(1)
+            employee.paymentMethod = paymentMethod
+        elif option == "5":
+            if employee.isInSyndicate == False:
+                employee.isInSyndicate = True
+                monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato\n"))
+                employee.monthlyFee = monthlyFee
+                Syndicate.addEmployee(employee)
+            else:
+                Syndicate.removeEmployee(employee.syndId)
+                employee.isInSyndicate = False
+                employee.syndId = " "
+                employee.monthlyFee = 0
+                employee.serviceFee = []
+        elif option == "6":
+            if employee.isInSyndicate == True:
+                employee.syndId = employee.syndId + 999
+            else:
+                return print("Funcionário não pertence ao sindicato")
+        elif option == "7":
+            if employee.isInSyndicate == False:
+                return print("Operação não permitida")
+            newMonthlyFee = input("Insira o novo valor da taxa mensal\n")
+            employee.monthlyFee = newMonthlyFee
+        
+        print("Operação realizada com sucesso!")
+
 class Syndicate:
     syndId = 999
     employees = []
@@ -125,8 +252,8 @@ class Syndicate:
                 Syndicate.employees.remove(employee)
     
     def printTable():
-        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎ ID Sindicato ╎" )
-        print("└" + 75*"╌" + "┘")
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎ ID Sindicato ╎" )
+        print("└" + 74*"╌" + "┘")
         for employee in Syndicate.employees:
             print(employee, end="")
             syndId = str(employee.syndId)
@@ -149,8 +276,8 @@ class WorkedHours:
     entries = []
 
     def printTable():
-        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎ Horas trabalhadas ╎")
-        print("└" + 80*"╌" + "┘")
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎ Horas trabalhadas ╎")
+        print("└" + 79*"╌" + "┘")
         for entry in WorkedHours.entries:
             print(entry, end="")
             totalHours = entry.workStatus["total hours"]
@@ -164,6 +291,7 @@ class WorkedHours:
 
     def punchIn():
         Company.printTable()
+        time.sleep(1)
         id = int(input("Por gentileza, informe seu ID\n"))
 
         for employee in Company.employees:
@@ -203,12 +331,14 @@ class Commissioned(Salaried):
         self.comissionPercent = comissionPercent
     
     def printTable():
-        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 16 + "╎ Endereço " + 7* " " + "╎ Comissão ╎" )
-        print("└" + 71*"╌" + "┘")
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎ Comissão ╎" )
+        print("└" + 70*"╌" + "┘")
+        
         for employee in Company.employees:
-            if employee.category == "Comissionado" : print(employee, end="")
-            comission = str(employee.comissionPercent)
-            print(comission + (9 - len(comission))* " " + "╎")
+            if employee.category == "Comissionado":
+                print(employee, end="")
+                comission = str(employee.comissionPercent)
+                print(comission + (9 - len(comission))* " " + "╎")
         print("\n")
         time.sleep(1)
 
@@ -217,7 +347,7 @@ class Commissioned(Salaried):
         id = int(input("Informe o ID do funcionário\n"))
     
         for employee in Company.employees:
-            if employee.id == id:
+            if employee.id == id and employee.category == "Comissionado":
                 date = str(input("Insira a data de venda no seguinte formato: AAAA-MM-DD\n"))
                 date = datetime.datetime.strptime(date, "%Y-%m-%d")
                 sale = int(input("Insira o valor da venda\n"))
@@ -279,7 +409,7 @@ def menu():
         elif choice == "5":
             Syndicate.addServiceFee()
         elif choice == "6":
-            print("Em breve")
+            Employee.edit()
         elif choice == "7":
             Company.printTable()
         
