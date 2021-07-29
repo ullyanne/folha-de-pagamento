@@ -2,6 +2,7 @@ import time, datetime, textwrap
 from company import Company
 from syndicate import Syndicate
 from payroll import Payroll
+from util import Util
 
 class Employee:
     def __init__(self, name, address, category, id, paymentMethod, isInSyndicate):
@@ -22,17 +23,16 @@ class Employee:
                 + self.address + " " * (15-len(self.address)) + " ╎ ")
     
     def create(category, name, address, id, paymentMethod, isInSyndicate):
-        if category == "1":
-            wage = input("Insira quanto o empregado recebe por hora:\n")
+        if category == 1:
+            wage = input("Insira quanto o empregado recebe por hora: R$")
             newEmployee = Hourly(name, address, "Horista", id, paymentMethod, isInSyndicate, wage)
-        elif category == "2":
-            fixedSalary = input("Insira o salário fixo mensal:\n")
+        elif category == 2:
+            fixedSalary = input("Insira o salário fixo mensal: R$")
             newEmployee = Salaried(name, address, "Assalariado", id, paymentMethod, isInSyndicate, fixedSalary)
-        elif category == "3":
-            fixedSalary = input("Insira o salário fixo mensal:\n")
+        elif category == 3:
+            fixedSalary = input("Insira o salário fixo mensal: R$")
             comissionPercent = int(input("Insira o percentual de comissão:\n"))
             newEmployee = Commissioned(name, address, "Comissionado", id, paymentMethod, isInSyndicate, fixedSalary, comissionPercent)
-
 
         return newEmployee
 
@@ -51,67 +51,55 @@ class Employee:
         print("\n")
         time.sleep(1)
         
-    #a alterar
-    def edit(employee, option):
-        if option == "1":
-            category = ""
-
-            while category not in ["1", "2", "3"]:
-                category = input(textwrap.dedent("""\
-                                                    Escolha a nova categoria:
-                                                        [1] - Horista
-                                                        [2] - Assalariado
-                                                        [3] - Comissionado\n"""))
-                
-                if category not in ["1", "2", "3"]:
-                    print("Tipo inválido")
-                    time.sleep(1)
-            
-            newEmployee = Employee.create(category, employee.name, employee.address, employee.id, employee.paymentMethod, employee.isInSyndicate)
-            
-            if employee.isInSyndicate:
-                Syndicate.addEmployee(newEmployee, employee.monthlyFee, employee.syndId, employee.serviceFee)
-                Syndicate.removeEmployee(employee.syndId)
-            
-            Company.removeEmployee(employee.id)
-            Company.addEmployee(newEmployee)
-        elif option == "2":
-            newName = input("Insira o novo nome\n")
-            employee.name = newName
-        elif option == "3":
-            newAddress = input("Insira o novo endereço\n")
-            employee.address = newAddress
-        elif option == "4":
-            paymentMethod = ""
-            while paymentMethod not in ["1", "2", "3"]:
-                paymentMethod = input(textwrap.dedent("""\
-                                                        Escolha o novo método de pagamento
-                                                            [1] - Cheque pelos correios
-                                                            [2] - Cheque em mãos
-                                                            [3] - Depósito em conta bancária\n"""))
-                if paymentMethod not in ["1", "2", "3"]:
-                    print("Método de pagamento inválido")
-                    time.sleep(1)
-            employee.paymentMethod = paymentMethod
-        elif option == "5":
-            if employee.isInSyndicate == False:
-                monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato\n"))
-                employee.monthlyFee = monthlyFee
-                Syndicate.addEmployee(employee, monthlyFee, Syndicate.genSyndId(), True, 0)
-            else:
-                Syndicate.removeEmployee(employee)
-        elif option == "6":
-            if employee.isInSyndicate == True:
-                employee.syndId = Syndicate.genSyndId()
-            else:
-                return print("Funcionário não pertence ao sindicato")
-        elif option == "7":
-            if employee.isInSyndicate == False:
-                return print("Operação não permitida")
-            newMonthlyFee = input("Insira o novo valor da taxa mensal\n")
-            employee.monthlyFee = newMonthlyFee
+    def editCategory(self):
+        category = ""
+        category = Util.validChoice(category, 3, Util.newEmpType)
+        newEmployee = Employee.create(category, self.name, self.address, self.id, self.paymentMethod, self.isInSyndicate)
         
-        print("Operação realizada com sucesso!")
+        if self.isInSyndicate:
+            Syndicate.addEmployee(newEmployee, self.monthlyFee, self.syndId, self.isInSyndicate, self.serviceFee)
+        
+        Company.removeEmployee(self.id)
+        Company.addEmployee(newEmployee)
+    def editName(self):
+        newName = input("Insira o novo nome\n")
+        self.name = newName
+    def editAdress(self):
+        newAddress = input("Insira o novo endereço\n")
+        self.address = newAddress
+    def editPaymentMethod(self):
+        paymentMethod = ""
+        self.paymentMethod = Util.validChoice(paymentMethod, 3, Util.newPaymentMethod)
+    def editSyndStatus(self):
+        if self.isInSyndicate == False:
+            self.monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
+            self.isInSyndicate = True
+            Syndicate.addEmployee(self, self.monthlyFee, Syndicate.genSyndId(), self.isInSyndicate, 0)
+        else:
+            Syndicate.removeEmployee(self)
+    def editSyndId(self):
+        if self.isInSyndicate == True:
+            self.syndId = Syndicate.genSyndId()
+        else:
+            return print("Funcionário não pertence ao sindicato")
+    def editMonthlyFee(self):
+        if self.isInSyndicate == False:
+            return print("Operação não permitida")
+        self.monthlyFee= input("Insira o novo valor da taxa mensal: R$")
+    def edit(self, option):
+        try:
+            {
+            1: self.editCategory,
+            2: self.editName,
+            3: self.editAdress,
+            4: self.editPaymentMethod,
+            5: self.editSyndStatus,
+            6: self.editSyndId,
+            7: self.editMonthlyFee
+            }.get(option)()
+            print("Operação realizada com sucesso!")
+        except:
+            Util.errorMessage()
 
 class Hourly(Employee):
     def __init__(self, name, address, category, id, paymentMethod, isInSyndicate, wage):
@@ -151,9 +139,17 @@ class Commissioned(Salaried):
 
             if employee.category == "Comissionado":
                 date = str(input("Insira a data de venda no seguinte formato: AAAA-MM-DD\n"))
-                date = datetime.datetime.strptime(date, "%Y-%m-%d")
-                sale = int(input("Insira o valor da venda\n"))
+
+                try:
+                    date = datetime.datetime.strptime(date, "%Y-%m-%d")
+                except:
+                    print("Formato inválido")
+                    return
+                
+                sale = int(input("Insira o valor da venda: R$"))
                 employee.salary = employee.salary + employee.comissionPercent/100 * sale
                 print("Venda lançada com sucesso!")
+            else:
+                print("Operação não permitida")
         except:
             print("Funcionário não encontrado")

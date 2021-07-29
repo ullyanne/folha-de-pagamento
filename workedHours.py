@@ -31,7 +31,12 @@ class WorkedHours:
         elif employee.category != "Horista": return print("Operação não permitida")
         else:
             currentHour = str(input("Insira a data e o horário atual no seguinte formato: AAAA-MM-DD HH:MM\n"))
-            currentHour = datetime.datetime.strptime(currentHour, "%Y-%m-%d %H:%M")
+            
+            try:
+                currentHour = datetime.datetime.strptime(currentHour, "%Y-%m-%d %H:%M")
+            except:
+                print("Formato inválido")
+                return
 
             if employee.workStatus["entry"] == None:
                 employee.workStatus["entry"] = currentHour
