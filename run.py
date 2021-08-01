@@ -1,4 +1,4 @@
-import time, datetime, textwrap
+import time, datetime
 from employee import Employee, Commissioned
 from workedHours import WorkedHours
 from company import Company
@@ -23,7 +23,7 @@ class Menu:
             
             if isInSyndicate == "S":
                 isInSyndicate = True
-                monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
+                monthlyFee = float(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
                 syndId = Syndicate.genSyndId()
             elif isInSyndicate == "N":
                 isInSyndicate = False
@@ -103,20 +103,9 @@ class Menu:
         Menu.greetings()
         choice = ""
         while choice != 9:
-            choice = int(input(textwrap.dedent("""\
-                    ==========================================
-                    O que deseja fazer, hoje?
-                        [1] - Adicionar um empregado
-                        [2] - Remover um empregado
-                        [3] - Lançar um cartão de ponto
-                        [4] - Lançar um resultado de venda
-                        [5] - Lançar uma taxa de serviço
-                        [6] - Alterar detalhes de um empregado
-                        [7] - Listar os empregados cadastrados
-                        [8] - Folha de pagamento
-                        [9] - Sair\n""")))
-            
-            Menu.selectOption.get(choice, Util.errorMessage)()
+            choice = ""
+            choice = Util.validChoice(choice, 9, Util.menu)
+            Menu.selectOption.get(choice)()
             if choice != 9 : time.sleep(1)
 
 Menu.menu()

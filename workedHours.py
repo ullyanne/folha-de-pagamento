@@ -1,5 +1,4 @@
-import time
-import datetime
+import time, datetime
 from company import Company
 from employee import Hourly
 

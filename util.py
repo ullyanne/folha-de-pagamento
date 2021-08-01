@@ -1,6 +1,18 @@
 import textwrap, time
 
 class Util:
+    menu = textwrap.dedent("""\
+                                ==========================================
+                                O que deseja fazer, hoje?
+                                    [1] - Adicionar um empregado
+                                    [2] - Remover um empregado
+                                    [3] - Lançar um cartão de ponto
+                                    [4] - Lançar um resultado de venda
+                                    [5] - Lançar uma taxa de serviço
+                                    [6] - Alterar detalhes de um empregado
+                                    [7] - Listar os empregados cadastrados
+                                    [8] - Folha de pagamento
+                                    [9] - Sair\n""")
     employeeType = textwrap.dedent("""\
                                         Insira o tipo do novo empregado:
                                             [1] - Horista
@@ -38,13 +50,22 @@ class Util:
                         Escolha uma opção abaixo:
                             [1] Rodar folha de pagamento
                             [2] Listar próximos pagamentos\n""")
+    
     def errorMessage():
         print("Opção inválida")
-
+    
+    def validIntChoice(choice):
+        try:
+            choice = int(choice)
+            return choice
+        except:
+            pass
+    
     def validChoice(choice, options, message):
         while choice not in list(range(1, options+1)):
                 print(message, end = "")
-                choice = int(input())
+                choice = input()
+                choice = Util.validIntChoice(choice)
                 if choice not in list(range(1, options+1)):
                     Util.errorMessage()
                     time.sleep(1)

@@ -64,7 +64,7 @@ class Employee:
     def editName(self):
         newName = input("Insira o novo nome\n")
         self.name = newName
-    def editAdress(self):
+    def editAddress(self):
         newAddress = input("Insira o novo endereço\n")
         self.address = newAddress
     def editPaymentMethod(self):
@@ -72,7 +72,7 @@ class Employee:
         self.paymentMethod = Util.validChoice(paymentMethod, 3, Util.newPaymentMethod)
     def editSyndStatus(self):
         if self.isInSyndicate == False:
-            self.fee.monthlyFee = int(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
+            self.fee.monthlyFee = float(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
             self.isInSyndicate = True
             Syndicate.addEmployee(self, self.fee, Syndicate.genSyndId(), self.isInSyndicate)
         else:
@@ -93,13 +93,13 @@ class Employee:
             {
             1: self.editCategory,
             2: self.editName,
-            3: self.editAdress,
+            3: self.editAddress,
             4: self.editPaymentMethod,
             5: self.editSyndStatus,
             6: self.editSyndId,
             7: self.editMonthlyFee
             }.get(option)()
-            if option != 6 or option != 7:
+            if option != 6 and option != 7:
                 print("Operação realizada com sucesso!")
         except:
             Util.errorMessage()
@@ -107,7 +107,7 @@ class Employee:
 class Hourly(Employee):
     def __init__(self, name, address, category, id, paymentMethod, payday, isInSyndicate, wage):
         super().__init__(name, address, category, id, paymentMethod, payday, isInSyndicate)
-        self.wage = int(wage)
+        self.wage = float(wage)
         self.workStatus = {"entry": None, "exit": None, "total hours": 0, "extra hours": 0}
     def printTable():
         print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎")
@@ -124,7 +124,7 @@ class Hourly(Employee):
 class Salaried(Employee):
     def __init__(self, name, address, category, id, paymentMethod, payday, isInSyndicate, fixedSalary):
         super().__init__(name, address, category, id, paymentMethod, payday, isInSyndicate)
-        self.fixedSalary = int(fixedSalary)
+        self.fixedSalary = float(fixedSalary)
     def calcSalary(self):
         self.salary = self.fixedSalary
         Fee.subtract(self)
@@ -132,8 +132,8 @@ class Salaried(Employee):
 class Commissioned(Salaried):
     def __init__(self, name, address, category, id, paymentMethod, payday, isInSyndicate, fixedSalary, comissionPercent):
         super().__init__(name, address, category, id, paymentMethod, payday, isInSyndicate, fixedSalary)
-        self.fixedSalary = int(fixedSalary)
-        self.comissionPercent = int(comissionPercent)
+        self.fixedSalary = float(fixedSalary)
+        self.comissionPercent = float(comissionPercent)
         self.sales = 0
     def calcSalary(self):
         self.salary = self.fixedSalary/2 + self.comissionPercent/100 * self.sales
@@ -168,7 +168,7 @@ class Commissioned(Salaried):
                     print("Formato inválido")
                     return
                 
-                employee.sales = int(input("Insira o valor da venda: R$"))
+                employee.sales = float(input("Insira o valor da venda: R$"))
                 
                 print("Venda lançada com sucesso!")
             else:

@@ -40,7 +40,7 @@ class Syndicate:
         syndId = int(input("Informe o ID do funcionário no sindicato\n"))
         
         if syndId in Syndicate.employees:
-            fees = int(input("Informe o valor da taxa de serviço a ser cobrada\n"))
+            fees = float(input("Informe o valor da taxa de serviço a ser cobrada: R$"))
             Syndicate.employees[syndId].fee.serviceFee.append(fees)
             print("Taxa de serviço atribuída com sucesso!")
         else:

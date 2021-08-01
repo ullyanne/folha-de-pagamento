@@ -1,6 +1,4 @@
-import time
 from random import randint
-from syndicate import Syndicate
 
 class Company:
     employees = {}
