@@ -4,12 +4,12 @@ from workedHours import WorkedHours
 from company import Company
 from syndicate import Syndicate
 from util import Util
+from payroll import Payroll
 
 class Menu:
     def addEmployee():
         category = 0
         paymentMethod = 0
-        monthlyFee = 0
         isInSyndicate = None
 
         name = input("Insira o nome do novo empregado:\n")
@@ -33,8 +33,10 @@ class Menu:
         
         newEmployee = Employee.create(category, name, address, id, paymentMethod, isInSyndicate)
         
+        
         if newEmployee.isInSyndicate:
-            Syndicate.addEmployee(newEmployee, monthlyFee, syndId, isInSyndicate, [])
+            newEmployee.fee.monthlyFee = monthlyFee
+            Syndicate.addEmployee(newEmployee, newEmployee.fee, syndId, isInSyndicate)
         
         Company.addEmployee(newEmployee)
         print("Empregado adicionado com sucesso!")
@@ -67,6 +69,10 @@ class Menu:
             print("Funcionário não encontrado")
     def printEmployees():
         Company.printTable()
+    def payroll():
+        option = ""
+        option = Util.validChoice(option, 2, Util.payroll)
+        Payroll.pay() if option == 1 else Payroll.paymentTable()
     def quit():
         print("Até mais :)")
 
@@ -78,7 +84,8 @@ class Menu:
         5: addServiceFee,
         6: editEmployee,
         7: printEmployees,
-        8: quit
+        8: payroll,
+        9: quit
     }
 
     def greetings():
@@ -95,7 +102,7 @@ class Menu:
     def menu():
         Menu.greetings()
         choice = ""
-        while choice != 8:
+        while choice != 9:
             choice = int(input(textwrap.dedent("""\
                     ==========================================
                     O que deseja fazer, hoje?
@@ -106,9 +113,10 @@ class Menu:
                         [5] - Lançar uma taxa de serviço
                         [6] - Alterar detalhes de um empregado
                         [7] - Listar os empregados cadastrados
-                        [8] - Sair\n""")))
+                        [8] - Folha de pagamento
+                        [9] - Sair\n""")))
             
             Menu.selectOption.get(choice, Util.errorMessage)()
-            if choice != 8 : time.sleep(1)
+            if choice != 9 : time.sleep(1)
 
 Menu.menu()

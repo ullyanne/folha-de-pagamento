@@ -17,10 +17,10 @@ class Util:
                                             [2] - Cheque em mãos
                                             [3] - Depósito em conta bancária\n""")
     newPaymentMethod = textwrap.dedent("""\
-                                                        Escolha o novo método de pagamento
-                                                            [1] - Cheque pelos correios
-                                                            [2] - Cheque em mãos
-                                                            [3] - Depósito em conta bancária\n""")
+                                            Escolha o novo método de pagamento
+                                                [1] - Cheque pelos correios
+                                                [2] - Cheque em mãos
+                                                [3] - Depósito em conta bancária\n""")
     workedHours = textwrap.dedent("""\
                             Escolha uma opção abaixo:
                                 [1] - Bater ponto
@@ -34,7 +34,10 @@ class Util:
                             [5] - Status no sindicato
                             [6] - ID no sindicato
                             [7] - Taxa mensal\n""")
-
+    payroll = textwrap.dedent("""\
+                        Escolha uma opção abaixo:
+                            [1] Rodar folha de pagamento
+                            [2] Listar próximos pagamentos\n""")
     def errorMessage():
         print("Opção inválida")
 

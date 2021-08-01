@@ -11,19 +11,19 @@ class Syndicate:
             syndId = randint(0, 1000)
         return syndId
 
-    def addEmployee(new, monthlyFee, syndId, isInSyndicate, serviceFee):
-        new.monthlyFee = monthlyFee
-        new.syndId = syndId
-        new.isInSyndicate = isInSyndicate
-        new.serviceFee = serviceFee
-        Syndicate.employees[new.syndId] = new
+    def addEmployee(employee, fee, syndId, isInSyndicate):
+        employee.fee = fee
+        employee.syndId = syndId
+        employee.isInSyndicate = isInSyndicate
+        Syndicate.employees[employee.syndId] = employee
     
     def removeEmployee(employee):
         del Syndicate.employees[employee.syndId]
         employee.isInSyndicate = False
         employee.syndId = " "
-        employee.monthlyFee = 0
-        employee.serviceFee = []
+        employee.fee.monthlyFee = 0
+        employee.fee.serviceFee = []
+        employee.fee.lastPaymentMonth = None
     
     def printTable():
         print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎ ID Sindicato ╎" )
@@ -40,8 +40,8 @@ class Syndicate:
         syndId = int(input("Informe o ID do funcionário no sindicato\n"))
         
         if syndId in Syndicate.employees:
-            fee = int(input("Informe o valor da taxa de serviço a ser cobrada\n"))
-            Syndicate.employees[syndId].serviceFee.append(fee)
+            fees = int(input("Informe o valor da taxa de serviço a ser cobrada\n"))
+            Syndicate.employees[syndId].fee.serviceFee.append(fees)
             print("Taxa de serviço atribuída com sucesso!")
         else:
             print("ID no sindicato inválido")
