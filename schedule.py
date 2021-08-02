@@ -38,5 +38,4 @@ class Biweekly(Schedule):
             payday = today + timedelta((today.weekday() + self.desiredDay)%6 + 14)
         else:
             payday = today + timedelta(self.desiredDay - today.weekday() + 14)
-            print(payday)
         return payday

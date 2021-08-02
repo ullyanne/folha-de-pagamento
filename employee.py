@@ -35,7 +35,6 @@ class Employee:
             fixedSalary = input("Insira o salário fixo mensal: R$")
             comissionPercent = float(input("Insira o percentual de comissão []%: "))
             newEmployee = Commissioned(name, address, "Comissionado", id, paymentMethod, Biweekly(4), isInSyndicate, fixedSalary, comissionPercent)
-            print(newEmployee.schedule.payday)
 
         return newEmployee
 
