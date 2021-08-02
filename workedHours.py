@@ -13,7 +13,7 @@ class WorkedHours:
             print(entry, end="")
             totalHours = entry.workStatus["total hours"] + entry.workStatus["extra hours"]
             if entry.workStatus["entry"] != None:
-                print("Em serviço" + 8* " ")
+                print("Em serviço" + 8* " " + "╎")
             else: 
                 print(int(totalHours), end="")
                 print((20 - len(str(totalHours)))* " " + "╎", end=" ")
@@ -26,21 +26,13 @@ class WorkedHours:
         time.sleep(1)
         id = int(input("Por gentileza, informe seu ID\n"))
         
-        try:
-            employee = Company.employees[id]
-        except:
-            print("Funcionário não encontrado")
+        employee = Company.searchEmployee(id)
+        if employee == False:
             return
-
+        
         if employee.category != "Horista": return print("Operação não permitida")
         else:
-            currentHour = str(input("Insira a data e o horário atual no seguinte formato: AAAA-MM-DD HH:MM\n"))
-            
-            try:
-                currentHour = datetime.datetime.strptime(currentHour, "%Y-%m-%d %H:%M")
-            except:
-                print("Formato inválido")
-                return
+            currentHour = datetime.datetime.now()
 
             if employee.workStatus["entry"] == None:
                 employee.workStatus["entry"] = currentHour

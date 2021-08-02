@@ -21,4 +21,12 @@ class Company:
 
     def removeEmployee(id):
         del Company.employees[id]
+    
+    def searchEmployee(id):
+        try:
+            employee = Company.employees[id]
+            return employee
+        except:
+            print("Funcionário não encontrado")
+            return False
 

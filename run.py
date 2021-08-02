@@ -7,6 +7,11 @@ from util import Util
 from payroll import Payroll
 
 class Menu:
+    def employeeMenu():
+        option = ""
+        option = Util.validChoice(option, 5, Util.employeeMenu)
+        if option != 5:
+            Menu.employeeOptions.get(option)()
     def addEmployee():
         category = 0
         paymentMethod = 0
@@ -63,29 +68,41 @@ class Menu:
         
         if id in Company.employees:
             option = ""
-            option = Util.validChoice(option, 7, Util.editEmployee)
-            Company.employees[id].edit(option)
+            option = Util.validChoice(option, 8, Util.editEmployee)
+            if option != 8:
+                Company.employees[id].edit(option)
         else:
             print("Funcionário não encontrado")
     def printEmployees():
         Company.printTable()
     def payroll():
         option = ""
-        option = Util.validChoice(option, 2, Util.payroll)
-        Payroll.pay() if option == 1 else Payroll.paymentTable()
+        option = Util.validChoice(option, 3, Util.payroll)
+        if option != 3:
+            Payroll.pay() if option == 1 else Payroll.paymentTable()
+    def schedules():
+        option = ""
+        option = Util.validChoice(option, 3, Util.schedules)
+        if option != 3:
+            Payroll.selectSchedule() if option == 1 else Payroll.addSchedule()
     def quit():
         print("Até mais :)")
 
     selectOption = {
+        1: employeeMenu,
+        2: workedHours,
+        3: postSale,
+        4: addServiceFee,
+        5: payroll,
+        6: schedules,
+        7: quit
+    }
+
+    employeeOptions = {
         1: addEmployee,
         2: delEmployee,
-        3: workedHours,
-        4: postSale,
-        5: addServiceFee,
-        6: editEmployee,
-        7: printEmployees,
-        8: payroll,
-        9: quit
+        3: editEmployee,
+        4: printEmployees
     }
 
     def greetings():
@@ -102,10 +119,10 @@ class Menu:
     def menu():
         Menu.greetings()
         choice = ""
-        while choice != 9:
+        while choice != 7:
             choice = ""
-            choice = Util.validChoice(choice, 9, Util.menu)
+            choice = Util.validChoice(choice, 7, Util.menu)
             Menu.selectOption.get(choice)()
-            if choice != 9 : time.sleep(1)
+            if choice != 7 : time.sleep(1)
 
 Menu.menu()

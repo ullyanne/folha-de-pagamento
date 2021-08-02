@@ -1,3 +1,4 @@
+from schedule import Biweekly, LastDay, Weekly
 import time, datetime
 from company import Company
 from syndicate import Syndicate
@@ -6,13 +7,13 @@ from payroll import Payroll
 from util import Util
 
 class Employee:
-    def __init__(self, name, address, category, id, paymentMethod, payday, isInSyndicate):
+    def __init__(self, name, address, category, id, paymentMethod, schedule, isInSyndicate):
         self.name = name
         self.address = address
         self.category = category
         self.id = id
         self.paymentMethod = paymentMethod
-        self.payday = payday
+        self.schedule = schedule
         self.isInSyndicate = isInSyndicate
         self.syndId = " "
         self.salary = 0
@@ -26,14 +27,15 @@ class Employee:
     def create(category, name, address, id, paymentMethod, isInSyndicate):
         if category == 1:
             wage = input("Insira quanto o empregado recebe por hora: R$")
-            newEmployee = Hourly(name, address, "Horista", id, paymentMethod, Payroll.weekly(), isInSyndicate, wage)
+            newEmployee = Hourly(name, address, "Horista", id, paymentMethod, Weekly(4), isInSyndicate, wage)
         elif category == 2:
             fixedSalary = input("Insira o salário fixo mensal: R$")
-            newEmployee = Salaried(name, address, "Assalariado", id, paymentMethod, Payroll.lastDay(), isInSyndicate, fixedSalary)
+            newEmployee = Salaried(name, address, "Assalariado", id, paymentMethod, LastDay(None), isInSyndicate, fixedSalary)
         elif category == 3:
             fixedSalary = input("Insira o salário fixo mensal: R$")
-            comissionPercent = int(input("Insira o percentual de comissão []%: "))
-            newEmployee = Commissioned(name, address, "Comissionado", id, paymentMethod, Payroll.biweekly(), isInSyndicate, fixedSalary, comissionPercent)
+            comissionPercent = float(input("Insira o percentual de comissão []%: "))
+            newEmployee = Commissioned(name, address, "Comissionado", id, paymentMethod, Biweekly(4), isInSyndicate, fixedSalary, comissionPercent)
+            print(newEmployee.schedule.payday)
 
         return newEmployee
 
@@ -50,7 +52,7 @@ class Employee:
             print("╎ " + str(employee.fee.monthlyFee) + (12 - len(str(employee.fee.monthlyFee)))* " " + "╎")
         print("\n")
         time.sleep(1)
-        
+
     def editCategory(self):
         category = ""
         category = Util.validChoice(category, 3, Util.newEmpType)
@@ -72,7 +74,8 @@ class Employee:
         self.paymentMethod = Util.validChoice(paymentMethod, 3, Util.newPaymentMethod)
     def editSyndStatus(self):
         if self.isInSyndicate == False:
-            self.fee.monthlyFee = float(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
+            monthlyFee = float(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
+            self.setMonthlyFee(monthlyFee)
             self.isInSyndicate = True
             Syndicate.addEmployee(self, self.fee, Syndicate.genSyndId(), self.isInSyndicate)
         else:
@@ -86,7 +89,8 @@ class Employee:
     def editMonthlyFee(self):
         if self.isInSyndicate == False:
             return print("Operação não permitida")
-        self.fee.monthlyFee = input("Insira o novo valor da taxa mensal: R$")
+        monthlyFee = float(input("Insira o novo valor da taxa mensal: R$"))
+        self.setMonthlyFee(monthlyFee)
         print("Operação realizada com sucesso!")
     def edit(self, option):
         try:
@@ -103,10 +107,16 @@ class Employee:
                 print("Operação realizada com sucesso!")
         except:
             Util.errorMessage()
-
+    def setMonthlyFee(self, monthlyFee):
+        self.fee.monthlyFee = monthlyFee
+    def setServiceFee(self, fee):
+        self.fee.serviceFee.append(fee)
+    def setSchedule(self, schedule):
+        self.schedule = schedule
+    
 class Hourly(Employee):
-    def __init__(self, name, address, category, id, paymentMethod, payday, isInSyndicate, wage):
-        super().__init__(name, address, category, id, paymentMethod, payday, isInSyndicate)
+    def __init__(self, name, address, category, id, paymentMethod, schedule, isInSyndicate, wage):
+        super().__init__(name, address, category, id, paymentMethod, schedule, isInSyndicate)
         self.wage = float(wage)
         self.workStatus = {"entry": None, "exit": None, "total hours": 0, "extra hours": 0}
     def printTable():
@@ -122,16 +132,16 @@ class Hourly(Employee):
         self.workStatus["extra hours"] = 0
 
 class Salaried(Employee):
-    def __init__(self, name, address, category, id, paymentMethod, payday, isInSyndicate, fixedSalary):
-        super().__init__(name, address, category, id, paymentMethod, payday, isInSyndicate)
+    def __init__(self, name, address, category, id, paymentMethod, schedule, isInSyndicate, fixedSalary):
+        super().__init__(name, address, category, id, paymentMethod, schedule, isInSyndicate)
         self.fixedSalary = float(fixedSalary)
     def calcSalary(self):
         self.salary = self.fixedSalary
         Fee.subtract(self)
 
 class Commissioned(Salaried):
-    def __init__(self, name, address, category, id, paymentMethod, payday, isInSyndicate, fixedSalary, comissionPercent):
-        super().__init__(name, address, category, id, paymentMethod, payday, isInSyndicate, fixedSalary)
+    def __init__(self, name, address, category, id, paymentMethod, schedule, isInSyndicate, fixedSalary, comissionPercent):
+        super().__init__(name, address, category, id, paymentMethod, schedule, isInSyndicate, fixedSalary)
         self.fixedSalary = float(fixedSalary)
         self.comissionPercent = float(comissionPercent)
         self.sales = 0
@@ -155,23 +165,21 @@ class Commissioned(Salaried):
     def postSale():
         Commissioned.printTable()
         id = int(input("Informe o ID do funcionário\n"))
+        employee = Company.searchEmployee(id)
+        if employee == False:
+            return
         
-        try:
-            employee = Company.employees[id]
+        if employee.category == "Comissionado":
+            date = str(input("Insira a data de venda no seguinte formato: AAAA-MM-DD\n"))
 
-            if employee.category == "Comissionado":
-                date = str(input("Insira a data de venda no seguinte formato: AAAA-MM-DD\n"))
-
-                try:
-                    date = datetime.datetime.strptime(date, "%Y-%m-%d")
-                except:
-                    print("Formato inválido")
-                    return
-                
-                employee.sales = float(input("Insira o valor da venda: R$"))
-                
-                print("Venda lançada com sucesso!")
-            else:
-                print("Operação não permitida")
-        except:
-            print("Funcionário não encontrado")
+            try:
+                date = datetime.datetime.strptime(date, "%Y-%m-%d")
+            except:
+                print("Formato inválido")
+                return
+            
+            employee.sales = float(input("Insira o valor da venda: R$"))
+            
+            print("Venda lançada com sucesso!")
+        else:
+            print("Operação não permitida")
