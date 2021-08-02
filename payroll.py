@@ -13,7 +13,7 @@ class Payroll:
 
     currentSchedules = 3
     schedule = {
-        1: LastDay,
+        1: LastDay(None),
         2: Weekly(4),
         3: Biweekly(4)
     }
@@ -41,23 +41,31 @@ class Payroll:
     def addSchedule():
         newSchedule = input(textwrap.dedent("""\
                         Especifique a nova agenda a ser criada
+                        Sintaxe:    mensal [dia]; semanal [1/2] [dia da semana]
                         Exemplos:   mensal 7 -> pagamentos no dia 7 de todo mês
                                     semanal 1 quinta -> pagamentos toda semana às quintas
                                     semanal 2 terça -> pagamentos a cada 2 semanas às terças\n"""))
         newSchedule = newSchedule.lower().split()
         Payroll.currentSchedules = Payroll.currentSchedules + 1
         
-        if newSchedule[0] == "mensal":
-            Payroll.schedule[Payroll.currentSchedules] = Monthly(int(newSchedule[1]))
-        elif newSchedule[0] == "semanal":
-            if(newSchedule[2] == "sabado" or newSchedule[2] == "sábado" or newSchedule[2] == "domingo"):
-                Payroll.currentSchedules = Payroll.currentSchedules - 1
-                return print("Apenas são aceitos dias de semana")
-            if newSchedule[1] == "1":
-                Payroll.schedule[Payroll.currentSchedules] = Weekly(Payroll.weekdays[newSchedule[2]])
-            elif newSchedule[1] == "2":
-                Payroll.schedule[Payroll.currentSchedules] = Biweekly(Payroll.weekdays[newSchedule[2]])
-        Payroll.displaySchedule.append(" ".join(newSchedule).lower())
+        try:
+            if newSchedule[0] == "mensal":
+                Payroll.schedule[Payroll.currentSchedules] = Monthly(int(newSchedule[1]))
+            elif newSchedule[0] == "semanal":
+                if(newSchedule[2] == "sabado" or newSchedule[2] == "sábado" or newSchedule[2] == "domingo"):
+                    Payroll.currentSchedules = Payroll.currentSchedules - 1
+                    return print("Apenas são aceitos dias de semana")
+                if newSchedule[1] == "1":
+                    Payroll.schedule[Payroll.currentSchedules] = Weekly(Payroll.weekdays[newSchedule[2]])
+                elif newSchedule[1] == "2":
+                    Payroll.schedule[Payroll.currentSchedules] = Biweekly(Payroll.weekdays[newSchedule[2]])
+                else:
+                    Payroll.currentSchedules = Payroll.currentSchedules - 1
+                    return print(f"Argumento {newSchedule[1]} não aceito")
+        except:
+            Payroll.currentSchedules = Payroll.currentSchedules - 1
+            return print("A quantidade de argumentos fornecida não é suficiente para criar a agenda")
+        Payroll.displaySchedule.append(" ".join(newSchedule).capitalize())
         print("Agenda adicionada com sucesso!")
     def paymentTable():
         print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎ Data de Pagamento ╎ Método de Pagamento        ╎")
