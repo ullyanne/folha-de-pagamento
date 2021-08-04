@@ -16,7 +16,7 @@ class WorkedHours:
                 print("Em serviço" + 8* " " + "╎")
             else: 
                 print(int(totalHours), end="")
-                print((20 - len(str(totalHours)))* " " + "╎", end=" ")
+                print((18 - len(str(int(totalHours))))* " " + "╎", end=" ")
                 print(int(entry.workStatus["extra hours"]), end="")
                 print((13 - len(str(int(entry.workStatus["extra hours"]))))* " " + "╎")
         print("\n")
