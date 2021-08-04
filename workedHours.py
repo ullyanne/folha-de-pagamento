@@ -13,7 +13,7 @@ class WorkedHours:
             print(entry, end="")
             totalHours = entry.workStatus["total hours"] + entry.workStatus["extra hours"]
             if entry.workStatus["entry"] != None:
-                print("Em serviço" + 8* " " + "╎")
+                print("Em serviço" + 23* " " + "╎")
             else: 
                 print(int(totalHours), end="")
                 print((18 - len(str(int(totalHours))))* " " + "╎", end=" ")
