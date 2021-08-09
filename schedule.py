@@ -3,13 +3,24 @@ from datetime import date, timedelta
 
 class Schedule:
     def __init__(self, desiredDay):
-        self.desiredDay = desiredDay
-        self.payday = self.calc()
-    def setPayday(self):
-        self.payday = self.calc()
+        self._desiredDay = desiredDay
+        self._payday = self.calc()
+    
+    @property
+    def desiredDay(self):
+        return self._desiredDay
+    
+    @property
+    def payday(self):
+        return self._payday
+    @payday.setter
+    def payday(self, payday):
+        self._payday = payday
 class LastDay(Schedule):
-    def calc(self):
-        today = date.today()
+    @staticmethod
+    def calc():
+        today = date.today() + timedelta(days=1)
+        
         payday = calendar.monthrange(today.year, today.month)[1]
         payday = today + timedelta(days=payday - today.day)
 
@@ -25,17 +36,11 @@ class Monthly(Schedule):
 class Weekly(Schedule):
     def calc(self):
         today = date.today()
-        if today.weekday() > self.desiredDay:
-            payday = today + timedelta((today.weekday() + self.desiredDay)%6 + 7)
-        else:
-            payday = today + timedelta(self.desiredDay - today.weekday() + 7)
+        payday = today + timedelta((self.desiredDay - today.weekday())%7 + 7)
         return payday
 class Biweekly(Schedule):
     def calc(self):
         today = date.today()
         today.weekday() 
-        if today.weekday() > self.desiredDay:
-            payday = today + timedelta((today.weekday() + self.desiredDay)%6 + 14)
-        else:
-            payday = today + timedelta(self.desiredDay - today.weekday() + 14)
+        payday = today + timedelta((self.desiredDay - today.weekday())%7 + 14)
         return payday

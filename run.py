@@ -1,4 +1,5 @@
-import time, datetime
+import datetime
+from time import sleep
 from employee import Employee, Commissioned
 from workedHours import WorkedHours
 from company import Company
@@ -7,11 +8,6 @@ from util import Util
 from payroll import Payroll
 
 class Menu:
-    def employeeMenu():
-        option = ""
-        option = Util.validChoice(option, 5, Util.employeeMenu)
-        if option != 5:
-            Menu.employeeOptions.get(option)()
     def addEmployee():
         category = 0
         paymentMethod = 0
@@ -34,10 +30,9 @@ class Menu:
                 isInSyndicate = False
             else:
                 print("Resposta inválida")
-                time.sleep(1)
+                sleep(1)
         
         newEmployee = Employee.create(category, name, address, id, paymentMethod, isInSyndicate)
-        
         
         if newEmployee.isInSyndicate:
             newEmployee.fee.monthlyFee = monthlyFee
@@ -59,32 +54,71 @@ class Menu:
         option = Util.validChoice(option, 2, Util.workedHours)
         WorkedHours.punchIn() if option == 1 else WorkedHours.printTable()
     def postSale():
-        Commissioned.postSale()
-    def addServiceFee():
-        Syndicate.addServiceFee()
-    def editEmployee():
-        Employee.printTable()
+        Commissioned.printTable()
+        
         id = int(input("Informe o ID do funcionário\n"))
         
         if id in Company.employees:
-            option = ""
-            option = Util.validChoice(option, 8, Util.editEmployee)
-            if option != 8:
-                Company.employees[id].edit(option)
+            employee = Company.employees[id]
+            if employee.category == "Comissionado":
+                employee.postSale()
+            else:
+                print("Operação não permitida")
         else:
             print("Funcionário não encontrado")
-    def printEmployees():
-        Company.printTable()
+    def addServiceFee():
+        Syndicate.addServiceFee()
+    def updateEmployee():
+        Company.printCompleteTable()
+        id = int(input("Informe o ID do funcionário\n"))
+        
+        if id not in Company.employees:
+            return print("Funcionário não encontrado")
+        option = ""
+        option = Util.validChoice(option, 8, Util.editEmployee)
+        if option != 8:
+            employee = Company.employees[id]
+            try:
+                {
+                1: employee.updateCategory,
+                2: employee.updateName,
+                3: employee.updateAddress,
+                4: employee.updatePaymentMethod,
+                5: employee.updateSyndStatus,
+                6: employee.updateSyndId,
+                7: employee.updateMonthlyFee
+                }.get(option)()
+                if option != 6 and option != 7:
+                    print("Operação realizada com sucesso!")
+            except:
+                Util.errorMessage()
+            if option != 8: sleep(1)
+    def employeeMenu():
+        option = ""
+        option = Util.validChoice(option, 5, Util.employeeMenu)
+        if option != 5:
+            try:
+                {
+                1: Menu.addEmployee,
+                2: Menu.delEmployee,
+                3: Menu.updateEmployee,
+                4: Company.printTable
+                }.get(option)()
+            except:
+                Util.errorMessage()
+            if option != 3: sleep(1)
     def payroll():
         option = ""
         option = Util.validChoice(option, 3, Util.payroll)
         if option != 3:
             Payroll.pay() if option == 1 else Payroll.paymentTable()
+            sleep(1)
     def schedules():
         option = ""
         option = Util.validChoice(option, 3, Util.schedules)
         if option != 3:
             Payroll.selectSchedule() if option == 1 else Payroll.addSchedule()
+            sleep(1)
     def quit():
         print("Até mais :)")
 
@@ -98,13 +132,6 @@ class Menu:
         7: quit
     }
 
-    employeeOptions = {
-        1: addEmployee,
-        2: delEmployee,
-        3: editEmployee,
-        4: printEmployees
-    }
-
     def greetings():
         now = datetime.datetime.now().hour
         if now >= 6 and now < 12:
@@ -114,7 +141,7 @@ class Menu:
         else:
             print(">>>> Boa noite,", end="")
         print(" seja bem-vindo(a) ao sistema de Folha de Pagamento <<<<\n")
-        time.sleep(1)
+        sleep(1)
     
     def menu():
         Menu.greetings()
@@ -123,6 +150,6 @@ class Menu:
             choice = ""
             choice = Util.validChoice(choice, 7, Util.menu)
             Menu.selectOption.get(choice)()
-            if choice != 7 : time.sleep(1)
+            if choice == 2 or choice == 3 or choice == 4: sleep(1)
 
 Menu.menu()

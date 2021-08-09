@@ -63,9 +63,11 @@ class Util:
                                     [2] Criar agenda de pagamento
                                     [3] Retornar\n""")
 
+    @staticmethod
     def errorMessage():
         print("Opção inválida")
     
+    @staticmethod
     def validIntChoice(choice):
         try:
             choice = int(choice)
@@ -73,6 +75,7 @@ class Util:
         except:
             pass
     
+    @staticmethod
     def validChoice(choice, options, message):
         while choice not in list(range(1, options+1)):
                 print(message, end = "")
