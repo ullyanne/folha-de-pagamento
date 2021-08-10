@@ -173,7 +173,7 @@ class Menu:
         choice = ""
         while choice != 9:
             choice = ""
-            choice = Util.validChoice(choice, 10, Util.menu)
+            choice = Util.validChoice(choice, 9, Util.menu)
             Menu.selectOption.get(choice)()
             if choice != 1 and choice != 5 and choice != 6 and choice != 9: sleep(1)
 
