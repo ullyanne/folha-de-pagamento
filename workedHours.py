@@ -1,6 +1,5 @@
 import datetime
 from company import Company
-from employee import Hourly
 
 #cartão de ponto
 class WorkedHours:
@@ -23,16 +22,8 @@ class WorkedHours:
         print("\n", end="")
     
     @classmethod
-    def punchIn(cls):
-        Hourly.printTable()
-        id = int(input("Por gentileza, informe seu ID\n"))
-        if id in Company.employees:
-            employee = Company.employees[id]
-            if employee.category != "Horista":
-                return print("Operação não permitida")
-        else:
-            return print("Funcionário não encontrado")
-
+    def punchIn(cls, id):
+        employee = Company.employees[id]
         currentHour = datetime.datetime.now()
 
         if employee.workStatus["entry"] == None:

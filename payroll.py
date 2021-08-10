@@ -1,4 +1,5 @@
 from datetime import date
+from mementoMngr import MementoMngr as mngr
 from time import sleep
 from schedule import Biweekly, LastDay, Monthly, Weekly
 from util import Util
@@ -92,6 +93,7 @@ class Payroll:
                 status = f"{Company.paymentMethod[employee.paymentMethod]} enviado no valor de R${employee.salary:.2f}"
                 print(status + (58-(len(status))) * " " + "╎")
                 employee.salary = 0
+                mngr.caretaker.manage()
         print("\n", end="")
         if paymentToday == 0:
             print("Nenhum funcionário a ser pago hoje\n")

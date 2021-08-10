@@ -1,4 +1,5 @@
-import textwrap, time
+import textwrap
+from time import sleep
 
 class Util:
     employeeMenu = textwrap.dedent("""\
@@ -17,7 +18,9 @@ class Util:
                                     [4] - Lançar uma taxa de serviço
                                     [5] - Folha de pagamento
                                     [6] - Agendas de pagamento
-                                    [7] - Sair\n""")
+                                    [7] - Desfazer ação
+                                    [8] - Refazer ação
+                                    [9] - Sair\n""")
     employeeType = textwrap.dedent("""\
                                         Insira o tipo do novo empregado:
                                             [1] - Horista
@@ -83,5 +86,5 @@ class Util:
                 choice = Util.validIntChoice(choice)
                 if choice not in list(range(1, options+1)):
                     Util.errorMessage()
-                    time.sleep(1)
+                    sleep(1)
         return choice

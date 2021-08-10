@@ -18,11 +18,11 @@ class Company:
 
     @classmethod
     def addEmployee(cls, employee):
-        Company.employees[employee.id] = employee
+        cls.employees[employee.id] = employee
     
     @classmethod
     def removeEmployee(cls, id):
-        del Company.employees[id]
+        del cls.employees[id]
     
     @staticmethod
     def printTable():

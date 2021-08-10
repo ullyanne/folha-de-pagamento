@@ -46,24 +46,30 @@ class Syndicate:
             fees = float(input("Informe o valor da taxa de serviço a ser cobrada: R$"))
             Syndicate.employees[syndId].fee.serviceFee = fees
             print("Taxa de serviço atribuída com sucesso!")
+            return True
         else:
             print("ID no sindicato inválido")
+            return False
     
     @staticmethod
     def updateMonthlyFee(employee):
         if employee.isInSyndicate == False:
-            return print("Operação não permitida")
+            print("Operação não permitida")
+            return False
         monthlyFee = float(input("Insira o novo valor da taxa mensal: R$"))
         employee.fee.monthlyFee = monthlyFee
         print("Operação realizada com sucesso!")
+        return True
     
     @staticmethod
     def updateSyndId(employee):
         if employee.isInSyndicate == False:
-            return print("Funcionário não pertence ao sindicato")
+            print("Funcionário não pertence ao sindicato")
+            return False
         
         employee.syndId = Syndicate.genSyndId()
         print("Operação realizada com sucesso!")
+        return True
 
     @classmethod
     def updateSyndStatus(cls, employee):

@@ -1,6 +1,7 @@
 import datetime
+from mementoMngr import MementoMngr as mngr
 from time import sleep
-from employee import Employee, Commissioned
+from employee import Employee, Commissioned, Hourly
 from workedHours import WorkedHours
 from company import Company
 from syndicate import Syndicate
@@ -39,6 +40,7 @@ class Menu:
             Syndicate.addEmployee(newEmployee, newEmployee.fee, syndId, isInSyndicate)
         
         Company.addEmployee(newEmployee)
+        mngr.caretaker.manage()
         print("Empregado adicionado com sucesso!")
     def delEmployee():
         Company.printTable()
@@ -46,13 +48,27 @@ class Menu:
 
         try:
             Company.removeEmployee(id)
+            mngr.caretaker.manage()
             print("Empregado removido com sucesso!")
         except:
             print("Funcionário não encontrado")
     def workedHours():
         option = ""
         option = Util.validChoice(option, 2, Util.workedHours)
-        WorkedHours.punchIn() if option == 1 else WorkedHours.printTable()
+        
+        if option == 1:
+            Hourly.printTable()
+            id = int(input("Por gentileza, informe seu ID\n"))
+            if id in Company.employees:
+                employee = Company.employees[id]
+                if employee.category != "Horista":
+                    return print("Operação não permitida")
+            else:
+                return print("Funcionário não encontrado")
+            WorkedHours.punchIn(id)
+            mngr.caretaker.manage()
+        else:
+            WorkedHours.printTable()
     def postSale():
         Commissioned.printTable()
         
@@ -67,7 +83,8 @@ class Menu:
         else:
             print("Funcionário não encontrado")
     def addServiceFee():
-        Syndicate.addServiceFee()
+        if Syndicate.addServiceFee() == True:
+            mngr.caretaker.manage()
     def updateEmployee():
         Company.printCompleteTable()
         id = int(input("Informe o ID do funcionário\n"))
@@ -89,6 +106,7 @@ class Menu:
                 7: employee.updateMonthlyFee
                 }.get(option)()
                 if option != 6 and option != 7:
+                    mngr.caretaker.manage()
                     print("Operação realizada com sucesso!")
             except:
                 Util.errorMessage()
@@ -119,6 +137,10 @@ class Menu:
         if option != 3:
             Payroll.selectSchedule() if option == 1 else Payroll.addSchedule()
             sleep(1)
+    def undo():
+        mngr.caretaker.undo()
+    def redo():
+        mngr.caretaker.redo()
     def quit():
         print("Até mais :)")
 
@@ -129,7 +151,9 @@ class Menu:
         4: addServiceFee,
         5: payroll,
         6: schedules,
-        7: quit
+        7: undo,
+        8: redo,
+        9: quit,
     }
 
     def greetings():
@@ -145,11 +169,12 @@ class Menu:
     
     def menu():
         Menu.greetings()
+        mngr.caretaker.manage()
         choice = ""
-        while choice != 7:
+        while choice != 9:
             choice = ""
-            choice = Util.validChoice(choice, 7, Util.menu)
+            choice = Util.validChoice(choice, 10, Util.menu)
             Menu.selectOption.get(choice)()
-            if choice == 2 or choice == 3 or choice == 4: sleep(1)
+            if choice != 1 and choice != 5 and choice != 6 and choice != 9: sleep(1)
 
 Menu.menu()
