@@ -86,6 +86,7 @@ class Payroll:
         for employee in Company.employees.values():
             
             if employee.schedule.payday == date.today():
+                mngr.caretaker.manage()
                 employee.calcSalary()
                 employee.schedule.payday = employee.schedule.calc()
                 paymentToday = 1
@@ -93,7 +94,6 @@ class Payroll:
                 status = f"{Company.paymentMethod[employee.paymentMethod]} enviado no valor de R${employee.salary:.2f}"
                 print(status + (58-(len(status))) * " " + "╎")
                 employee.salary = 0
-                mngr.caretaker.manage()
         print("\n", end="")
         if paymentToday == 0:
             print("Nenhum funcionário a ser pago hoje\n")
