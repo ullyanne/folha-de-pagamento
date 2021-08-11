@@ -61,13 +61,16 @@ class Syndicate:
         print("Operação realizada com sucesso!")
         return True
     
-    @staticmethod
-    def updateSyndId(employee):
+    @classmethod
+    def updateSyndId(cls, employee):
         if employee.isInSyndicate == False:
             print("Funcionário não pertence ao sindicato")
             return False
         
-        employee.syndId = Syndicate.genSyndId()
+        id = Syndicate.genSyndId()
+        del cls.employees[employee.syndId]
+        employee.syndId = id
+        cls.employees[employee.syndId] = employee
         print("Operação realizada com sucesso!")
         return True
 
