@@ -68,3 +68,7 @@ class Caretaker():
         self._mementos.append(self._originator.save())
         self._originator.restore(self._redo.pop())
         self._originator.createState()
+
+class Settings():
+    originator = Originator()
+    caretaker = Caretaker(originator)

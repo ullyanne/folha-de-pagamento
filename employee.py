@@ -1,5 +1,5 @@
 from schedule import Biweekly, LastDay, Weekly
-from mementoMngr import MementoMngr as mngr
+from memento import Settings as memento
 from time import sleep
 from company import Company
 from syndicate import Syndicate
@@ -103,7 +103,7 @@ class Employee:
         self._syndId = syndId
     def updateSyndId(self):
         if Syndicate.updateSyndId(self) == True:
-            mngr.caretaker.manage()
+            memento.caretaker.manage()
     
     @property
     def fee(self):
@@ -113,7 +113,7 @@ class Employee:
         self._fee = fee
     def updateMonthlyFee(self):
         if Syndicate.updateMonthlyFee(self) == True:
-            mngr.caretaker.manage()
+            memento.caretaker.manage()
     
     @property
     def schedule(self):
@@ -213,5 +213,5 @@ class Commissioned(Salaried):
             return
         
         self.sales = float(input("Insira o valor da venda: R$"))
-        mngr.caretaker.manage()
+        memento.caretaker.manage()
         print("Venda lançada com sucesso!")

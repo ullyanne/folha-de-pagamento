@@ -1,5 +1,5 @@
 from datetime import date
-from mementoMngr import MementoMngr as mngr
+from memento import Settings as memento
 from time import sleep
 from schedule import Biweekly, LastDay, Monthly, Weekly
 from util import Util
@@ -86,15 +86,17 @@ class Payroll:
         for employee in Company.employees.values():
             
             if employee.schedule.payday == date.today():
-                mngr.caretaker.manage()
+                memento.caretaker.manage()
                 employee.calcSalary()
                 employee.schedule.payday = employee.schedule.calc()
-                paymentToday = 1
-                print(employee, end ="")
-                status = f"{Company.paymentMethod[employee.paymentMethod]} enviado no valor de R${employee.salary:.2f}"
-                print(status + (58-(len(status))) * " " + "╎")
-                employee.salary = 0
+                
+                if employee.salary:
+                    paymentToday = 1
+                    print(employee, end ="")
+                    status = f"{Company.paymentMethod[employee.paymentMethod]} enviado no valor de R${employee.salary:.2f}"
+                    print(status + (58-(len(status))) * " " + "╎")
+                    employee.salary = 0
         print("\n", end="")
-        if paymentToday == 0:
+        if not paymentToday:
             print("Nenhum funcionário a ser pago hoje\n")
 

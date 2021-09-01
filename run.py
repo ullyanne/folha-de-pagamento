@@ -1,5 +1,5 @@
 import datetime
-from mementoMngr import MementoMngr as mngr
+from memento import Settings as memento
 from time import sleep
 from employee import Employee, Commissioned, Hourly
 from workedHours import WorkedHours
@@ -40,7 +40,7 @@ class Menu:
             Syndicate.addEmployee(newEmployee, newEmployee.fee, syndId, isInSyndicate)
         
         Company.addEmployee(newEmployee)
-        mngr.caretaker.manage()
+        memento.caretaker.manage()
         print("Empregado adicionado com sucesso!")
     def delEmployee():
         Company.printTable()
@@ -48,7 +48,7 @@ class Menu:
 
         try:
             Company.removeEmployee(id)
-            mngr.caretaker.manage()
+            memento.caretaker.manage()
             print("Empregado removido com sucesso!")
         except:
             print("Funcionário não encontrado")
@@ -66,7 +66,7 @@ class Menu:
             else:
                 return print("Funcionário não encontrado")
             WorkedHours.punchIn(id)
-            mngr.caretaker.manage()
+            memento.caretaker.manage()
         else:
             WorkedHours.printTable()
     def postSale():
@@ -84,7 +84,7 @@ class Menu:
             print("Funcionário não encontrado")
     def addServiceFee():
         if Syndicate.addServiceFee() == True:
-            mngr.caretaker.manage()
+            memento.caretaker.manage()
     def updateEmployee():
         Company.printCompleteTable()
         id = int(input("Informe o ID do funcionário\n"))
@@ -106,7 +106,7 @@ class Menu:
                 7: employee.updateMonthlyFee
                 }.get(option)()
                 if option != 6 and option != 7:
-                    mngr.caretaker.manage()
+                    memento.caretaker.manage()
                     print("Operação realizada com sucesso!")
             except:
                 Util.errorMessage()
@@ -138,9 +138,9 @@ class Menu:
             Payroll.selectSchedule() if option == 1 else Payroll.addSchedule()
             sleep(1)
     def undo():
-        mngr.caretaker.undo()
+        memento.caretaker.undo()
     def redo():
-        mngr.caretaker.redo()
+        memento.caretaker.redo()
     def quit():
         print("Até mais :)")
 
@@ -169,7 +169,7 @@ class Menu:
     
     def menu():
         Menu.greetings()
-        mngr.caretaker.manage()
+        memento.caretaker.manage()
         choice = ""
         while choice != 9:
             choice = ""
