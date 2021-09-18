@@ -1,6 +1,6 @@
-from company import Company
-from workedHours import WorkedHours
-from syndicate import Syndicate
+from ..company import Company
+from ..workedHours import WorkedHours
+from ..syndicate import Syndicate
 from copy import deepcopy
 
 class Originator():

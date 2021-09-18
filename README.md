@@ -19,7 +19,244 @@ cd folha-de-pagamento
 python run.py
 ```
 ## Design pattern
-- Memento
+- Extract Class
+- Extract Method
+- [Factory Method](src/employee/employeeFactory.py)
+- [Memento](src/tools/memento.py)
+- Move Method
+- Replace Temp With Query
+
+## Code Smells
+
+- **Duplicate Code** 
+
+    :pencil: Uso da mesma estrutura de tabela em diversas classes
+
+    `employee.py`:
+    ```py
+    def printTable():
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎")
+        print("└" + 59*"╌" + "┘")
+        ...
+    ```
+
+    `payroll.py`:
+    ```py
+    def paymentTable():
+        print("\n╎ Categoria    ╎ ID ╎ Nome " + " " * 15 + "╎ Endereço " + 7* " " + "╎ Data de Pagamento ╎ Método de Pagamento        ╎")
+        print("└" + 108*"╌" + "┘")
+        ...
+    ```
+
+    :pushpin: Solução: [Extract Class](src/table/columns.py)
+    
+    ---
+
+    :pencil: Múltiplas ocorrências de checagem de funcionário e, caso não encontrado no sistema, exibição de mensagem de erro
+
+    `run.py`:
+    ```py
+    def updateEmployee():
+        ...
+        if id not in Company.employees:
+            return print("Funcionário não encontrado")
+        ...
+    ```
+
+    `payroll.py`:
+    ```py
+    def selectSchedule():
+        ...
+        if id not in Company.employees:
+            return print("Funcionário não encontrado")
+        ...
+    ```
+
+    :pushpin: Solução: [Extract Method]()
+
+
+***
+
+- **Feature Envy**
+
+    :pencil: As informações do funcionário eram acessadas constantemente, em vez de métodos da instância serem invocados
+    
+    `workedHours.py`:
+    ```py
+    def punchIn():
+        ...
+        employee.workStatus["exit"] = currentHour
+        hours = (employee.workStatus["exit"] - employee.workStatus["entry"]).total_seconds()/3600
+        extraHours = 0
+
+        if hours > 8:
+            extraHours = hours - 8
+            employee.workStatus["extra hours"] = employee.workStatus["extra hours"] + extraHours
+        
+        employee.workStatus["total hours"] = employee.workStatus["total hours"] + hours - extraHours
+        employee.workStatus["entry"] = None
+    ```
+
+    :pushpin: Solução: [Move Method]()
+
+    ```py
+    def punchIn():
+        employee.setExitHour(cls.currentHour())
+        employee.setWorkdayExtraHours()
+        employee.setTotalHours()
+        employee.resetEntryHour()
+    ```
+
+***
+
+- **If Statements**
+
+    :pencil: Ifs em excesso
+
+    `run.py`:
+    ```py
+    def workedHours():
+        ...
+        if option == 1:
+            ...
+            if id in Company.employees:
+                employee = Company.employees[id]
+                if employee.category != "Horista":
+                    return print("Operação não permitida")
+            else:
+                return print("Funcionário não encontrado")
+            WorkedHours.punchIn(id)
+            memento.caretaker.manage()
+        else:
+            WorkedHours.printTable()
+    ```
+
+    :pushpin: Solução: [Dispatch Table]()
+    ```py
+    def workedHoursMenu():
+        ...
+        {
+            1: cls.punchIn,
+            2: WorkedHours.printTable
+        }.get(option)()
+    
+    def punchIn():
+        ...
+        if Company.isInCompany(id) and Util.isInstance(Company.getEmployee(id), Hourly):
+            WorkedHours.punchIn(id)
+            memento.caretaker.manage()
+    ```
+
+***
+
+- **Long Method**
+    
+    :pencil: Expressões extensas e de difícil compreensão
+
+    `schedule.py`:
+    ```py
+    def calc():
+    today = date.today() + timedelta(days=1)
+    
+    payday = calendar.monthrange(today.year, today.month)[1]
+    payday = today + timedelta(days=payday - today.day)
+
+    if payday.weekday() == 5 or payday.weekday() == 6:
+        payday = payday - timedelta(payday.weekday() - 4)
+
+    return payday
+    ``` 
+
+    `schedule.py`:
+    ```py
+    def calc():
+        today = date.today()
+        today.weekday() 
+        payday = today + timedelta((self.desiredDay - today.weekday())%7 + 14)
+        return payday
+    ``` 
+    
+    `workedHours.py`:
+    ```py
+    def punchIn():
+        currentHour = datetime.datetime.now()
+        if ...:
+            employee.workStatus["entry"] = currentHour
+            ...
+        else:
+            employee.workStatus["exit"] = currentHour
+            hours = (employee.workStatus["exit"] - employee.workStatus["entry"]).total_seconds()/3600
+            extraHours = 0
+            if hours > 8:
+                extraHours = hours - 8
+                employee.workStatus["extra hours"] = employee.workStatus["extra hours"] + extraHours
+        ...
+    ```
+
+    `employee.py`:
+
+    ```py
+    def calcSalary():
+        self.salary = self.wage * self.workStatus["total hours"] + (1.5 * self.wage * self.workStatus["extra hours"]) - self.fee.subtract(self.isInSyndicate)
+        self.workStatus["total hours"] = 0
+        self.workStatus["extra hours"] = 0
+    ```
+
+    :pushpin: Solução: Extract Method
+
+    [`schedule.py:`]()
+    ```py
+    def calc():
+        today = date.today() + timedelta(days=1)
+        payday = self.lastDayOfMonth(today, self.monthDays(today))
+
+        if self.notBusinessDay(payday):
+            payday = self.previousBusinessDay(payday)
+
+        return payday
+    ```
+
+    [`schedule.py:`]()
+    ```py
+    def calc():
+        today = date.today()
+        payday = self.weekdayNextWeek(today)
+        return payday
+    ```
+
+    :pushpin: Solução: Replace Temp With Query
+
+    [`workedHours.py`:]()
+    ```py
+    def punchIn():
+        ...
+        if ...:
+                cls.addEntry(employee, cls.currentHour())
+        else:
+            employee.setExitHour(cls.currentHour())
+            employee.setWorkdayExtraHours()
+            ...
+    ```
+    
+    [`workedHours.py`:]()
+    ```py
+    def currentHour():
+        return datetime.datetime.now()
+    ```
+
+    [`hourly.py`:]()
+    ```py
+    def getWorkdayExtraHours():
+        return self.getWorkdayHours() - 8 if (self.getWorkdayHours() - 8) > 0 else 0
+    ```
+
+    [`hourly.py`:]()
+    ```py
+    def calcSalary():
+        self.salary = self.wageSalary() + self.bonusSalary() - self.subtractFees()
+        self.resetWorkingHours()
+    ```
+
 
 ## Functions
 |   Função   |  Título  |    Descrição    | Status |

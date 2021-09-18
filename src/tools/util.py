@@ -65,7 +65,13 @@ class Util:
                                     [1] Selecionar agenda de pagamento
                                     [2] Criar agenda de pagamento
                                     [3] Retornar\n""")
-
+    newSchedules = textwrap.dedent("""\
+                        Especifique a nova agenda a ser criada
+                        Sintaxe:    mensal [dia]; semanal [1/2] [dia da semana]
+                        Exemplos:   mensal 7 -> pagamentos no dia 7 de todo mês
+                                    semanal 1 quinta -> pagamentos toda semana às quintas
+                                    semanal 2 terça -> pagamentos a cada 2 semanas às terças\n""")
+    
     @staticmethod
     def errorMessage():
         print("Opção inválida")
@@ -88,3 +94,8 @@ class Util:
                     Util.errorMessage()
                     sleep(1)
         return choice
+
+    def isInstance(employee, type):
+        if isinstance(employee, type):
+            return True
+        return print("Operação não permitida")

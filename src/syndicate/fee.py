@@ -1,8 +1,8 @@
 from datetime import date
 
 class Fee:
-    def __init__(self):
-        self._monthlyFee = 0
+    def __init__(self, monthlyFee=0):
+        self._monthlyFee = monthlyFee
         self._serviceFee = []
         self._lastPaymentMonth = None
     

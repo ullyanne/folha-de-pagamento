@@ -1,22 +1,19 @@
-import datetime
-from memento import Settings as memento
+from datetime import datetime
 from time import sleep
-from employee import Employee, Commissioned, Hourly
-from workedHours import WorkedHours
-from company import Company
-from syndicate import Syndicate
-from util import Util
-from payroll import Payroll
+from src import Settings as memento
+from src import EmployeeFactory, Commissioned, Hourly
+from src import WorkedHours, Company, Syndicate, Util, Payroll
 
 class Menu:
+    @staticmethod
     def addEmployee():
         category = 0
         paymentMethod = 0
         isInSyndicate = None
+        monthlyFee = 0
 
         name = input("Insira o nome do novo empregado:\n")
         address = input("Insira o endereço do novo empregado:\n")
-        id = Company.genId()
         category = Util.validChoice(category, 3, Util.employeeType)
         paymentMethod = Util.validChoice(paymentMethod, 3, Util.paymentMethod)
         
@@ -26,138 +23,152 @@ class Menu:
             if isInSyndicate == "S":
                 isInSyndicate = True
                 monthlyFee = float(input("Insira o valor da taxa mensal cobrada pelo sindicato: R$"))
-                syndId = Syndicate.genSyndId()
             elif isInSyndicate == "N":
                 isInSyndicate = False
             else:
                 print("Resposta inválida")
                 sleep(1)
-        
-        newEmployee = Employee.create(category, name, address, id, paymentMethod, isInSyndicate)
+
+        newEmployee = EmployeeFactory.createEmployee(category, name, address, Company.genId(), paymentMethod, isInSyndicate, monthlyFee)
         
         if newEmployee.isInSyndicate:
-            newEmployee.fee.monthlyFee = monthlyFee
-            Syndicate.addEmployee(newEmployee, newEmployee.fee, syndId, isInSyndicate)
+            Syndicate.addEmployee(newEmployee, newEmployee.fee, Syndicate.genSyndId(), isInSyndicate)
         
         Company.addEmployee(newEmployee)
         memento.caretaker.manage()
         print("Empregado adicionado com sucesso!")
+    @staticmethod
     def delEmployee():
         Company.printTable()
         id = int(input("Informe o ID do funcionário que deseja remover\n"))
-
-        try:
+        if Company.isInCompany(id):
             Company.removeEmployee(id)
             memento.caretaker.manage()
             print("Empregado removido com sucesso!")
-        except:
-            print("Funcionário não encontrado")
-    def workedHours():
-        option = ""
-        option = Util.validChoice(option, 2, Util.workedHours)
-        
-        if option == 1:
-            Hourly.printTable()
-            id = int(input("Por gentileza, informe seu ID\n"))
-            if id in Company.employees:
-                employee = Company.employees[id]
-                if employee.category != "Horista":
-                    return print("Operação não permitida")
-            else:
-                return print("Funcionário não encontrado")
+    @staticmethod
+    def punchIn():
+        Company.printHourlyTable()
+        id = int(input("Por gentileza, informe seu ID\n"))
+        if Company.isInCompany(id) and Util.isInstance(Company.getEmployee(id), Hourly):
             WorkedHours.punchIn(id)
             memento.caretaker.manage()
-        else:
-            WorkedHours.printTable()
+    @staticmethod
     def postSale():
-        Commissioned.printTable()
-        
+        Company.printCommissionedTable()
         id = int(input("Informe o ID do funcionário\n"))
-        
-        if id in Company.employees:
-            employee = Company.employees[id]
-            if employee.category == "Comissionado":
-                employee.postSale()
-            else:
-                print("Operação não permitida")
-        else:
-            print("Funcionário não encontrado")
+        employee = Company.getEmployee(id)
+        if Company.isInCompany(id) and Util.isInstance(employee, Commissioned):
+            employee.postSale()
+
+    @staticmethod
     def addServiceFee():
-        if Syndicate.addServiceFee() == True:
-            memento.caretaker.manage()
-    def updateEmployee():
-        Company.printCompleteTable()
-        id = int(input("Informe o ID do funcionário\n"))
-        
-        if id not in Company.employees:
-            return print("Funcionário não encontrado")
-        option = ""
-        option = Util.validChoice(option, 8, Util.editEmployee)
-        if option != 8:
-            employee = Company.employees[id]
-            try:
-                {
-                1: employee.updateCategory,
-                2: employee.updateName,
-                3: employee.updateAddress,
-                4: employee.updatePaymentMethod,
-                5: employee.updateSyndStatus,
-                6: employee.updateSyndId,
-                7: employee.updateMonthlyFee
-                }.get(option)()
-                if option != 6 and option != 7:
-                    memento.caretaker.manage()
-                    print("Operação realizada com sucesso!")
-            except:
-                Util.errorMessage()
-            if option != 8: sleep(1)
-    def employeeMenu():
-        option = ""
-        option = Util.validChoice(option, 5, Util.employeeMenu)
-        if option != 5:
-            try:
-                {
-                1: Menu.addEmployee,
-                2: Menu.delEmployee,
-                3: Menu.updateEmployee,
-                4: Company.printTable
-                }.get(option)()
-            except:
-                Util.errorMessage()
-            if option != 3: sleep(1)
+        Syndicate.printTable()
+        syndId = int(input("Informe o ID do funcionário no sindicato\n"))
+        Syndicate.addServiceFee(syndId)
+        memento.caretaker.manage()
+
+    @staticmethod
     def payroll():
         option = ""
         option = Util.validChoice(option, 3, Util.payroll)
         if option != 3:
-            Payroll.pay() if option == 1 else Payroll.paymentTable()
+            Payroll.pay() if option == 1 else Payroll.paydayTable()
             sleep(1)
+    @staticmethod
     def schedules():
         option = ""
         option = Util.validChoice(option, 3, Util.schedules)
         if option != 3:
             Payroll.selectSchedule() if option == 1 else Payroll.addSchedule()
             sleep(1)
+    @staticmethod
     def undo():
         memento.caretaker.undo()
+    @staticmethod
     def redo():
         memento.caretaker.redo()
+    @staticmethod
     def quit():
         print("Até mais :)")
 
-    selectOption = {
-        1: employeeMenu,
-        2: workedHours,
-        3: postSale,
-        4: addServiceFee,
-        5: payroll,
-        6: schedules,
-        7: undo,
-        8: redo,
-        9: quit,
-    }
+    @staticmethod
+    def updateSyndInfo(employee, option):
+        {
+        6: lambda: Syndicate.updateSyndId(employee),
+        7: lambda: Syndicate.updateMonthlyFee(employee)
+        }.get(option)()
+        if employee.isInSyndicate:
+            memento.caretaker.manage()
+            print("Operação realizada com sucesso!")
+    
+    @staticmethod
+    def updateInfo(employee, option):
+        {
+        1: lambda: EmployeeFactory.updateCategory(employee),
+        2: employee.updateName,
+        3: employee.updateAddress,
+        4: employee.updatePaymentMethod,
+        5: lambda: Syndicate.updateSyndStatus(employee)
+        }.get(option)()
+        memento.caretaker.manage()
+        print("Operação realizada com sucesso!")
+    
+    @classmethod
+    def updateEmployee(cls):
+        Company.printCompleteTable()
+        id = int(input("Informe o ID do funcionário\n"))
+        
+        if Company.isInCompany(id):
+            option = ""
+            option = Util.validChoice(option, 8, Util.editEmployee)
+            employee = Company.getEmployee(id)
 
+            if option != 8:
+                if option <= 5:
+                    cls.updateInfo(employee, option)
+                else:
+                    cls.updateSyndInfo(employee, option)
+                sleep(1)
+    
+    @classmethod
+    def employeeMenu(cls):
+        option = ""
+        option = Util.validChoice(option, 5, Util.employeeMenu)
+        if option != 5:
+            {
+            1: cls.addEmployee,
+            2: cls.delEmployee,
+            3: cls.updateEmployee,
+            4: Company.printTable
+            }.get(option)()
+            if option != 3: sleep(1)
+    
+    @classmethod
+    def workedHoursMenu(cls):
+        option = ""
+        option = Util.validChoice(option, 2, Util.workedHours)
+        {
+            1: cls.punchIn,
+            2: WorkedHours.printTable
+        }.get(option)()
+    
+    @classmethod
+    def generalMenu(cls, option):
+        {
+            1: cls.employeeMenu,
+            2: cls.workedHoursMenu,
+            3: cls.postSale,
+            4: cls.addServiceFee,
+            5: cls.payroll,
+            6: cls.schedules,
+            7: cls.undo,
+            8: cls.redo,
+            9: cls.quit,
+        }.get(option)()
+
+    @staticmethod
     def greetings():
-        now = datetime.datetime.now().hour
+        now = datetime.now().hour
         if now >= 6 and now < 12:
             print(">>>> Bom dia,", end="")
         elif now >= 12 and now < 18:
@@ -167,14 +178,16 @@ class Menu:
         print(" seja bem-vindo(a) ao sistema de Folha de Pagamento <<<<\n")
         sleep(1)
     
-    def menu():
+    @classmethod
+    def menu(cls):
         Menu.greetings()
         memento.caretaker.manage()
         choice = ""
         while choice != 9:
             choice = ""
             choice = Util.validChoice(choice, 9, Util.menu)
-            Menu.selectOption.get(choice)()
+            cls.generalMenu(choice)
             if choice != 1 and choice != 5 and choice != 6 and choice != 9: sleep(1)
 
-Menu.menu()
+if __name__ == "__main__":
+    Menu.menu()
