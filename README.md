@@ -72,7 +72,7 @@ python run.py
         ...
     ```
 
-    :pushpin: Solução: [Extract Method]()
+    :pushpin: Solução: [Extract Method](https://github.com/ullyanne/folha-de-pagamento/blob/693c2a85e46f4cdaa9545683317747019864b5ea/src/company.py#L21)
 
 
 ***
@@ -97,7 +97,7 @@ python run.py
         employee.workStatus["entry"] = None
     ```
 
-    :pushpin: Solução: [Move Method]()
+    :pushpin: Solução: [Move Method](https://github.com/ullyanne/folha-de-pagamento/blob/693c2a85e46f4cdaa9545683317747019864b5ea/src/workedHours.py#L23)
 
     ```py
     def punchIn():
@@ -131,7 +131,7 @@ python run.py
             WorkedHours.printTable()
     ```
 
-    :pushpin: Solução: [Dispatch Table]()
+    :pushpin: Solução: [Dispatch Table](https://github.com/ullyanne/folha-de-pagamento/blob/693c2a85e46f4cdaa9545683317747019864b5ea/run.py#L147)
     ```py
     def workedHoursMenu():
         ...
