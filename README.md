@@ -19,12 +19,12 @@ cd folha-de-pagamento
 python run.py
 ```
 ## Design pattern
-- Extract Class
 - Extract Method
 - [Factory Method](src/employee/employeeFactory.py)
 - [Memento](src/tools/memento.py)
 - Move Method
 - Replace Temp With Query
+- Template Method
 
 ## Code Smells
 
@@ -48,7 +48,7 @@ python run.py
         ...
     ```
 
-    :pushpin: Solução: [Extract Class](src/table/columns.py)
+    :pushpin: Solução: [Template Method](src/table/columns.py)
     
     ---
 
